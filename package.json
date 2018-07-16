@@ -1,0 +1,13 @@
+{
+  "name": "lunarcoin",
+  "version": "1.0.0",
+  "description": "Lunarcoin, the super awesome coin made in Javascript",
+  "main": "src/server.js",
+  "repository": "https://github.com/dimlightray/lunarcoin",
+  "author": "dimlightray@gmail.com",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "crypto.js": "^1.1.3"
+  }
+}
