@@ -46,6 +46,7 @@ const createNewBlock = data => {
         newTimestamp,
         data
     );
+    addNewBlock(newBlock);
     return newBlock;
 };
 
@@ -79,11 +80,11 @@ const isNewBlockStructureValid = block => {
     );
 };
 
-const isBlockchainValid = (candidateChain) => {
+const isBlockchainValid = candidateChain => {
     const isGenesisValid = block => {
         return JSON.stringify(block) === JSON.stringify(genesisBlock);
     };
-    if(!isGenesisValid(candidateChain[0])){
+    if(!isGenesisValid(candidateChain[0])) {
         console.log("The candidate blockchain's gensisBlock is not valid");
         return false;
     }
@@ -97,7 +98,7 @@ const isBlockchainValid = (candidateChain) => {
 
 const replaceChain = candidateChain => {
     if(isBlockchainValid(candidateChain) && candidateChain.length > getBlockchain().length) {
-        blockchain = candidateChain;
+        blockchain = candidateChain;    
         return true;
     } else {
         return false;
@@ -105,10 +106,15 @@ const replaceChain = candidateChain => {
 };
 
 const addNewBlock = candidateBlock => {
-    if(!isNewBlockValid(candidateBlock, getPreviousBlock())) {
+    if(isNewBlockValid(candidateBlock, getPreviousBlock())) {
         getBlockchain().push(candidateBlock);
         return true;
     } else {
         return false;
     }
+};
+
+module.exports = {
+    getBlockchain,
+    createNewBlock
 };
