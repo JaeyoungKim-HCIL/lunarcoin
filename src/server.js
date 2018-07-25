@@ -2,10 +2,12 @@ const express = require("express"),
 bodyParser = require("body-parser"),
 morgan = require("morgan"),
 Blockchain = require("./blockchain");
+P2P = require("./p2p");
 
 const { getBlockchain, createNewBlock } = Blockchain;
+const { startP2PServer, connectToPeers } = P2P;
 
-const PORT = 3000;
+const PORT = process.env.LUNAR_PORT;
 
 const app = express();
 
@@ -22,4 +24,21 @@ app.post("/blocks", (req, res) => {
     res.send(newBlock);
 });
 
-app.listen(PORT, () => console.log("Lunarcoin Server running on", PORT));
+app.post("/peers", (req, res) => {
+    const { body: { peer } } = req;
+    connectToPeers(peer);
+    res.send();
+});
+
+const server = app.listen(PORT).on('error', (err) => {
+    console.log("The port %s is already in use. Retrying another port...", PORT);
+    const RESERVED_PORT = 3000;
+    const server = app.listen(RESERVED_PORT);
+    console.log("Lunarcoin HTTP Server is running on", server.address().port);
+    startP2PServer(server);
+});
+
+try{
+    console.log("Lunarcoin HTTP Server is running on", server.address().port);
+    startP2PServer(server);
+}catch{}
