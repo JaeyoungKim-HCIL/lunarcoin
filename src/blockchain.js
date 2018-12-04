@@ -20,7 +20,7 @@ const genesisBlock = new Block(
 
 let blockchain = [genesisBlock];
 
-const getLastBlock = () => blockchain[blockchain.length - 1];
+const getNewestBlock = () => blockchain[blockchain.length - 1];
 
 const getTimestamp = () => new Date().getTime() / 1000;
 
@@ -30,7 +30,7 @@ const createHash = (index, previousHash, timestamp, data) =>
     CryptoJS.sha256(index + previousHash + timestamp + JSON.stringify(data)).toString();
 
 const createNewBlock = data => {
-    const previousBlock = getLastBlock();
+    const previousBlock = getNewestBlock();
     const newBlockIndex = previousBlock.index + 1;
     const newTimestamp = getTimestamp();
     const newHash = createHash(
@@ -46,14 +46,14 @@ const createNewBlock = data => {
         newTimestamp,
         data
     );
-    addNewBlock(newBlock);
+    addBlockToChain(newBlock);
     return newBlock;
 };
 
 const getBlockHash = block => createHash(block.index, block.previousHash, block.timestamp, block.data);
 
-const isNewBlockValid = (candidateBlock, latestBlock) => {
-    if(!isNewBlockStructureValid(candidateBlock)){
+const isBlockValid = (candidateBlock, latestBlock) => {
+    if(!isBlockStructureValid(candidateBlock)){
         console.log("The candidate block structure is not valid");
         return false;
     }
@@ -70,7 +70,7 @@ const isNewBlockValid = (candidateBlock, latestBlock) => {
     return true;
 };
 
-const isNewBlockStructureValid = block => {
+const isBlockStructureValid = block => {
     return (
         typeof block.index === "number" && 
         typeof block.hash == "string" && 
@@ -89,7 +89,7 @@ const isBlockchainValid = candidateChain => {
         return false;
     }
     for(let i = 1; i < candidateChain.length; i++){
-        if(!isNewBlockValid(candidateChain[i], candidateChain[i - 1])){
+        if(!isBlockValid(candidateChain[i], candidateChain[i - 1])){
             return false;
         }
     }
@@ -105,8 +105,8 @@ const replaceChain = candidateChain => {
     }
 };
 
-const addNewBlock = candidateBlock => {
-    if(isNewBlockValid(candidateBlock, getLastBlock())) {
+const addBlockToChain = candidateBlock => {
+    if(isBlockValid(candidateBlock, getNewestBlock())) {
         getBlockchain().push(candidateBlock);
         return true;
     } else {
@@ -115,7 +115,10 @@ const addNewBlock = candidateBlock => {
 };
 
 module.exports = {
-    getLastBlock,
+    getNewestBlock,
     getBlockchain,
-    createNewBlock
+    createNewBlock,
+    isBlockStructureValid,
+    addBlockToChain,
+    replaceChain
 };
